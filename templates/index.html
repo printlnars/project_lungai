@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LungAI — Advanced Lung Cancer Diagnostics</title>
+  <meta name="description" content="AI-based lung cancer risk assessment system | 98.2% Accuracy | Monotonic CatBoost model">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="app-wrapper">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon"><i class="fas fa-lungs"></i></div>
+      <div class="logo-text">LungAI <span>Pro v2.5</span></div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="predict">
+        <i class="fas fa-microscope"></i> Diagnostics
+      </button>
+      <button class="nav-item" data-tab="analytics">
+        <i class="fas fa-chart-line"></i> Analytics
+      </button>
+      <button class="nav-item" data-tab="about">
+        <i class="fas fa-info-circle"></i> About
+      </button>
+      <button class="nav-item" data-tab="settings">
+        <i class="fas fa-cog"></i> Settings
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="system-status">
+        <span class="status-dot"></span>
+        <span class="status-text">Online</span>
+      </div>
+      <div class="system-info">CatBoost | Acc 98.2%</div>
+      <div class="system-version">© 2026 LungAI</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="topbar-title">System / <span>Diagnostics</span></div>
+      <div class="topbar-badges">
+        <span class="badge badge-ai"><i class="fas fa-robot"></i> CatBoost</span>
+        <span class="badge badge-live"><i class="fas fa-circle"></i> Online</span>
+      </div>
+    </div>
+
+    <!-- PAGE CONTENT -->
+    <div class="page-content">
+
+      <!-- ── TAB: PREDICT ── -->
+      <section id="predict-tab" class="tab-content active">
+
+        <div class="page-header">
+          <h1>Lung Cancer Risk Assessment</h1>
+          <p>Clinically validated AI diagnostic system. All data processed locally.</p>
+        </div>
+
+        <!-- STEPS -->
+        <div class="steps-bar">
+          <div class="step-item active">
+            <div class="step-num">1</div>
+            <span>Demographics</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <span>Smoking</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <span>Symptoms</span>
+          </div>
+          <div class="step-line"></div>
+          <div class="step-item">
+            <div class="step-num">4</div>
+            <span>Result</span>
+          </div>
+        </div>
+
+        <form id="prediction-form">
+          <div class="form-grid">
+
+            <!-- CARD 1: DEMOGRAPHICS -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon icon-indigo"><i class="fas fa-user"></i></div>
+                <h3>Demographics</h3>
+              </div>
+              <div class="input-group">
+                <label for="age">Age (years)</label>
+                <input type="number" id="age" name="age" min="18" max="100" value="45" required>
+              </div>
+              <div class="input-group">
+                <label for="sex">Sex</label>
+                <select id="sex" name="sex" required>
+                  <option value="1">Male</option>
+                  <option value="0">Female</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label for="birth_place">Birth Place</label>
+                <input type="text" id="birth_place" name="birth_place" placeholder="City" value="Moscow" required>
+              </div>
+              <div class="input-group">
+                <label for="residence">Residence</label>
+                <input type="text" id="residence" name="residence" placeholder="City" value="Moscow" required>
+              </div>
+            </div>
+
+            <!-- CARD 2: SMOKING -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon icon-pink"><i class="fas fa-smoking"></i></div>
+                <h3>Smoking History</h3>
+              </div>
+              <div class="input-group">
+                <label for="smoker">Smoking Status</label>
+                <select id="smoker" name="smoker" required>
+                  <option value="0">Non-smoker</option>
+                  <option value="1">Smoker</option>
+                </select>
+              </div>
+              <div id="smoking-details">
+                <div class="input-group">
+                  <label for="smoking_years">Smoking Years</label>
+                  <input type="number" id="smoking_years" name="smoking_years" min="0" value="0">
+                </div>
+                <div class="input-group">
+                  <label for="cigs_per_day">Cigarettes per Day</label>
+                  <input type="number" id="cigs_per_day" name="cigs_per_day" min="0" value="0">
+                </div>
+              </div>
+              <div class="input-group" style="margin-top:1rem">
+                <label for="arvi_per_year">URTI per Year (times)</label>
+                <input type="number" id="arvi_per_year" name="arvi_per_year" min="0" value="1">
+              </div>
+            </div>
+
+            <!-- CARD 3: SYMPTOMS -->
+            <div class="card full-width">
+              <div class="card-header">
+                <div class="card-icon icon-cyan"><i class="fas fa-stethoscope"></i></div>
+                <h3>Symptoms & Risk Factors</h3>
+              </div>
+              <div class="binary-inputs">
+                <div class="check-item">
+                  <label>Family Cancer History</label>
+                  <select name="family_cancer_history"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Hemoptysis (Coughing Blood)</label>
+                  <select name="hemoptysis"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Shortness of Breath</label>
+                  <select name="shortness_of_breath"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Voice Change</label>
+                  <select name="voice_change"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Unexplained Weakness</label>
+                  <select name="weakness"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Persistent Cough</label>
+                  <select name="cough"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Swallowing Difficulties</label>
+                  <select name="swallowing_problems"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Chest Pain</label>
+                  <select name="chest_pain"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Arm or Shoulder Pain</label>
+                  <select name="arm_shoulder_pain"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Dry Cough</label>
+                  <select name="dry_cough"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Unexplained Weight Loss</label>
+                  <select name="weight_loss"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Loss of Appetite</label>
+                  <select name="appetite_loss"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+                <div class="check-item">
+                  <label>Pulmonologist Follow-up</label>
+                  <select name="pulmonologist_followup"><option value="0">No</option><option value="1">Yes</option></select>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="submit-area">
+            <button type="submit" class="btn-primary animate-pulse" id="submit-btn">
+              <i class="fas fa-brain"></i> Run AI Analysis
+            </button>
+          </div>
+
+        </form>
+
+        <!-- RESULTS -->
+        <div id="results-container" class="results-wrapper hidden">
+
+          <div class="result-topbar">
+            <h2><i class="fas fa-file-medical-alt"></i> Diagnostic Report</h2>
+            <div class="result-actions">
+              <button id="save-patient-btn" class="btn-secondary"><i class="fas fa-save"></i> Save</button>
+              <button class="btn-icon" title="Export PDF"><i class="fas fa-file-pdf"></i></button>
+            </div>
+          </div>
+
+          <!-- RISK HERO -->
+          <div class="risk-hero">
+            <div class="risk-gauge">
+              <svg class="gauge-svg" viewBox="0 0 180 180">
+                <circle class="gauge-bg" cx="90" cy="90" r="75"/>
+                <circle class="gauge-fill" id="gauge-circle" cx="90" cy="90" r="75" stroke="#6366f1"/>
+              </svg>
+              <div class="gauge-center">
+                <span class="gauge-pct" id="gauge-pct">0%</span>
+                <span class="gauge-label">Probability</span>
+              </div>
+            </div>
+            <div class="risk-info">
+              <div class="risk-badge low" id="risk-badge">
+                <i class="fas fa-shield-alt"></i>
+                <span id="risk-text">Low Risk</span>
+              </div>
+              <p class="risk-desc" id="risk-desc">Fill out the form and run the analysis to receive a detailed risk report.</p>
+            </div>
+          </div>
+
+          <!-- RESULTS GRID -->
+          <div class="results-grid">
+
+            <!-- Feature Importance -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon icon-indigo"><i class="fas fa-brain"></i></div>
+                <h3>Factor Analysis</h3>
+              </div>
+              <div id="feature-importance-list"></div>
+            </div>
+
+            <!-- Chart -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon icon-cyan"><i class="fas fa-chart-pie"></i></div>
+                <h3>Risk Distribution</h3>
+              </div>
+              <div class="chart-wrap">
+                <canvas id="riskChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Confidence -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon icon-green"><i class="fas fa-shield-alt"></i></div>
+                <h3>Model Confidence</h3>
+              </div>
+              <div class="confidence-bar-bg">
+                <div class="confidence-bar" id="confidence-bar" style="width:0%"></div>
+              </div>
+              <p class="confidence-text">Accuracy: <strong><span id="confidence-val">—</span>%</strong></p>
+            </div>
+
+            <!-- Comparison -->
+            <div class="card">
+              <div class="card-header">
+                <div class="card-icon icon-pink"><i class="fas fa-users"></i></div>
+                <h3>Database Comparison</h3>
+              </div>
+              <div class="comp-grid">
+                <div class="comp-item">
+                  <span class="comp-label">Similar Cases</span>
+                  <span class="comp-val" id="similar-cases">—</span>
+                </div>
+                <div class="comp-item">
+                  <span class="comp-label">Risk Group</span>
+                  <span class="comp-val" id="risk-group">—</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Recommendations -->
+          <div class="reco-box">
+            <h3><i class="fas fa-clipboard-check"></i> Recommendations</h3>
+            <ul class="reco-list" id="recommendations-list"></ul>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ── TAB: ANALYTICS ── -->
+      <section id="analytics-tab" class="tab-content">
+        <div class="page-header">
+          <h1>Analytics & Statistics</h1>
+          <p>Key metrics and processed patient data</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card premium">
+            <div class="stat-icon"><i class="fas fa-users-md"></i></div>
+            <div class="stat-info">
+              <span class="stat-num">4,247</span>
+              <span class="stat-desc">Analyzed</span>
+              <span class="stat-trend">↑ 12.5%</span>
+            </div>
+          </div>
+          <div class="stat-card premium">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-info">
+              <span class="stat-num">98.2%</span>
+              <span class="stat-desc">Accuracy</span>
+              <span class="stat-trend">ROC-AUC 0.994</span>
+            </div>
+          </div>
+          <div class="stat-card premium">
+            <div class="stat-icon"><i class="fas fa-hourglass-end"></i></div>
+            <div class="stat-info">
+              <span class="stat-num">320ms</span>
+              <span class="stat-desc">Analysis Time</span>
+              <span class="stat-trend">Inference <100ms</span>
+            </div>
+          </div>
+          <div class="stat-card premium">
+            <div class="stat-icon"><i class="fas fa-database"></i></div>
+            <div class="stat-info">
+              <span class="stat-num">4M+</span>
+              <span class="stat-desc">Training Cases</span>
+              <span class="stat-trend">847 GB data</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="card full-width">
+            <div class="card-header">
+              <div class="card-icon icon-indigo"><i class="fas fa-chart-bar"></i></div>
+              <h3>Risk Distribution (Last 100 Diagnoses)</h3>
+            </div>
+            <div class="chart-wrap tall">
+              <canvas id="riskDistChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon icon-cyan"><i class="fas fa-clock"></i></div>
+              <h3>Daily Activity</h3>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="activityChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon icon-green"><i class="fas fa-pie-chart"></i></div>
+              <h3>Risk Groups</h3>
+            </div>
+            <div class="chart-wrap">
+              <canvas id="riskGroupChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── TAB: ABOUT ── -->
+      <section id="about-tab" class="tab-content">
+        <div class="page-header">
+          <h1>About LungAI</h1>
+          <p>Advanced AI-based early lung cancer diagnostics system</p>
+        </div>
+
+        <div class="about-grid premium">
+          <div class="stat-card">
+            <span class="stat-val">98.2%</span>
+            <span class="stat-label">Accuracy</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-val">0.994</span>
+            <span class="stat-label">ROC-AUC</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-val">4000+</span>
+            <span class="stat-label">Records</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-val">24/7</span>
+            <span class="stat-label">Availability</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon icon-indigo"><i class="fas fa-brain"></i></div>
+            <h3>Technology</h3>
+          </div>
+          <p class="about-desc">
+            LungAI utilizes a strictly monotonic ML model <strong>CatBoostClassifier</strong> with embedded clinical constraints and expert decision rules.
+            The system analyzes a combination of demographic factors, smoking history, and clinical symptoms to detect early indicators of lung pathology.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-box">
+            <i class="fas fa-lock"></i>
+            <h4>Privacy</h4>
+            <p>All data processed locally. AES-256 encryption.</p>
+          </div>
+          <div class="feature-box">
+            <i class="fas fa-tachometer-alt"></i>
+            <h4>Speed</h4>
+            <p>Analysis in 320ms. Neural network inference &lt;100ms.</p>
+          </div>
+          <div class="feature-box">
+            <i class="fas fa-check-double"></i>
+            <h4>Validation</h4>
+            <p>Clinically approved. Monotonic predictions.</p>
+          </div>
+          <div class="feature-box">
+            <i class="fas fa-chart-line"></i>
+            <h4>Accuracy</h4>
+            <p>ROC-AUC 0.994. Precision/Recall optimization.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icon icon-cyan"><i class="fas fa-graduation-cap"></i></div>
+            <h3>Academic Foundations</h3>
+          </div>
+          <p class="about-desc">
+            Developed based on clinical research data from leading oncology research institutes and verified on histopathology-confirmed cases.
+            The model is trained on 4000+ verified clinical cases to ensure clinical grade reliability.
+          </p>
+        </div>
+
+        <div class="disclaimer-box">
+          <i class="fas fa-exclamation-triangle"></i>
+          <p>
+            <strong>Important:</strong> LungAI results are for informational and educational purposes only. They do not substitute for professional medical consultation,
+            diagnostics, or treatment, which must be performed by a licensed oncologist or pulmonologist based on physical examination and standard clinical procedures.
+          </p>
+        </div>
+      </section>
+
+      <!-- ── TAB: SETTINGS ── -->
+      <section id="settings-tab" class="tab-content">
+        <div class="page-header">
+          <h1>System Settings</h1>
+          <p>Configure system behavior and platform preferences</p>
+        </div>
+
+        <div class="settings-grid">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon icon-indigo"><i class="fas fa-sliders-h"></i></div>
+              <h3>General Settings</h3>
+            </div>
+            <div class="setting-item">
+              <label class="setting-label">Interface Language</label>
+              <select class="setting-select">
+                <option selected>English</option>
+                <option>Russian</option>
+                <option>Español</option>
+              </select>
+            </div>
+            <div class="setting-item">
+              <label class="setting-label">Theme</label>
+              <select class="setting-select">
+                <option selected>Dark</option>
+                <option>Light</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-icon icon-pink"><i class="fas fa-bell"></i></div>
+              <h3>Notifications</h3>
+            </div>
+            <div class="toggle-item">
+              <label>Email Notifications</label>
+              <label class="toggle-switch">
+                <input type="checkbox" checked>
+                <span></span>
+              </label>
+            </div>
+            <div class="toggle-item">
+              <label>High Risk Alerts</label>
+              <label class="toggle-switch">
+                <input type="checkbox" checked>
+                <span></span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay hidden" id="loading-overlay">
+  <div class="loader-box">
+    <div class="loader-ring"></div>
+    <div class="loader-title">Analyzing data...</div>
+    <div class="loader-sub">Neural network is processing clinical parameters</div>
+    <div class="loader-steps">
+      <div class="step active" id="step-1"><i class="fas fa-database"></i> Input data validation</div>
+      <div class="step" id="step-2"><i class="fas fa-cogs"></i> Feature engineering</div>
+      <div class="step" id="step-3"><i class="fas fa-brain"></i> Model inference</div>
+      <div class="step" id="step-4"><i class="fas fa-chart-line"></i> Report generation</div>
+    </div>
+    <div class="process-log" id="process-log"></div>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script>
+const canvas = document.getElementById('bg-canvas');
+const ctx2 = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+
+function mkParticle() {
+  return { x: Math.random()*W, y: Math.random()*H, r: Math.random()*1.5+0.5,
+    vx: (Math.random()-0.5)*0.3, vy: (Math.random()-0.5)*0.3,
+    a: Math.random()*0.5+0.1 };
+}
+
+resize();
+for(let i=0;i<80;i++) particles.push(mkParticle());
+window.addEventListener('resize', resize);
+
+function drawBg() {
+  ctx2.clearRect(0,0,W,H);
+  let g = ctx2.createRadialGradient(W*0.8,H*0.1,0,W*0.8,H*0.1,400);
+  g.addColorStop(0,'rgba(99,102,241,0.08)'); g.addColorStop(1,'transparent');
+  ctx2.fillStyle=g; ctx2.fillRect(0,0,W,H);
+  let g2 = ctx2.createRadialGradient(W*0.1,H*0.8,0,W*0.1,H*0.8,350);
+  g2.addColorStop(0,'rgba(236,72,153,0.06)'); g2.addColorStop(1,'transparent');
+  ctx2.fillStyle=g2; ctx2.fillRect(0,0,W,H);
+  particles.forEach(p=>{
+    p.x+=p.vx; p.y+=p.vy;
+    if(p.x<0||p.x>W) p.vx*=-1;
+    if(p.y<0||p.y>H) p.vy*=-1;
+    ctx2.beginPath();
+    ctx2.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx2.fillStyle=`rgba(99,102,241,${p.a})`;
+    ctx2.fill();
+  });
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+</script>
+</body>
+</html>

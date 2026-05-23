@@ -1,0 +1,11 @@
+import pandas as pd
+df = pd.read_csv("dataset_final.csv")
+print("Columns:", df.columns.tolist())
+print("Data types:")
+print(df.dtypes)
+print("Class distribution:")
+print(df['LUNG_CANCER'].value_counts())
+print("Unique birth_place:", df['birth_place'].unique()[:5])
+print("Unique residence:", df['residence'].unique()[:5])
+print("Describe age:")
+print(df['age'].describe())

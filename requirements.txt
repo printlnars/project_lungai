@@ -10,5 +10,6 @@ catboost>=1.2.0
 matplotlib>=3.8.0
 shap>=0.43.0
 pytorch-tabnet>=4.1.0
+flask>=3.0.0
 
 
