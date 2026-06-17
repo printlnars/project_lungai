@@ -384,6 +384,11 @@ select {
   padding-right:2.5rem;
 }
 
+select option {
+  background-color: var(--bg2);
+  color: var(--text);
+}
+
 /* ─── SYMPTOMS GRID ─── */
 .symptoms-section { margin-top:0.5rem; }
 

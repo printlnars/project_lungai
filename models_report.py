@@ -159,8 +159,8 @@ def plot_models_comparison(df_metrics: pd.DataFrame, out_path: str, dpi: int = 3
 
 
 def build_preprocessor(X: pd.DataFrame) -> ColumnTransformer:
-    categorical = [c for c in X.columns if X[c].dtype == object]
-    numeric = [c for c in X.columns if c not in categorical]
+    numeric = [c for c in X.columns if pd.api.types.is_numeric_dtype(X[c])]
+    categorical = [c for c in X.columns if c not in numeric]
     transformers = []
     if numeric:
         transformers.append(("num", SimpleImputer(strategy="median"), numeric))
@@ -183,7 +183,7 @@ def main():
     # Преобразование целевой переменной в числовой формат
     y = df[target_col].copy()
     # Попытка преобразовать YES/NO, Да/Нет в 1/0
-    if y.dtype == object:
+    if not pd.api.types.is_numeric_dtype(y):
         y_str = y.astype(str).str.strip().str.upper()
         y = y_str.map({
             'YES': 1, 'Y': 1, 'ДА': 1, 'Д': 1, '1': 1, 'TRUE': 1,
@@ -201,7 +201,7 @@ def main():
         # Преобразуем признаки в числовой формат для расчета риска
         risk_factors = {}
         for col in X_temp.columns:
-            if X_temp[col].dtype == object:
+            if not pd.api.types.is_numeric_dtype(X_temp[col]):
                 # Для категориальных признаков пробуем преобразовать
                 try:
                     risk_factors[col] = pd.to_numeric(X_temp[col], errors='coerce').fillna(0)
@@ -264,8 +264,8 @@ def main():
     # Предварительно обучаем препроцессор для определения имен признаков на выходе
     preprocessor.fit(X_train, y_train)
 
-    categorical_cols = [c for c in X.columns if X[c].dtype == object]
-    numeric_cols = [c for c in X.columns if c not in categorical_cols]
+    numeric_cols = [c for c in X.columns if pd.api.types.is_numeric_dtype(X[c])]
+    categorical_cols = [c for c in X.columns if c not in numeric_cols]
 
     if categorical_cols:
         cat_encoder = preprocessor.named_transformers_["cat"].named_steps["onehot"]
@@ -385,7 +385,7 @@ def main():
             "pred_thr_0_29": pred_029,
         }).head(10)
 
-        records_fmt = records.astype(float).applymap(format_float)
+        records_fmt = records.astype(float).map(format_float) if hasattr(records, 'map') else records.astype(float).applymap(format_float)
 
         print(f"=========== FIGURE {figure_idx}: {name} ===========\n")
         print("A) PREDICTION EXAMPLES (first 10 rows):")
@@ -554,8 +554,8 @@ def collect_results(path: str = "dataset_final.csv") -> Dict[str, Any]:
     # Предварительно обучаем препроцессор для определения имен признаков на выходе
     preprocessor.fit(X_train, y_train)
 
-    categorical_cols = [c for c in X.columns if X[c].dtype == object]
-    numeric_cols = [c for c in X.columns if c not in categorical_cols]
+    numeric_cols = [c for c in X.columns if pd.api.types.is_numeric_dtype(X[c])]
+    categorical_cols = [c for c in X.columns if c not in numeric_cols]
 
     if categorical_cols:
         cat_encoder = preprocessor.named_transformers_["cat"].named_steps["onehot"]

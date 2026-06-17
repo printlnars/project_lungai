@@ -43,7 +43,7 @@ def load_and_clean_data(filepath='dataset_final.csv'):
         # Ищем по ключевым словам или если колонка - уникальный строковый ID (высокая кардинальность)
         if any(kw in col_lower for kw in ['id', 'comment', 'name', 'unnamed', 'комментарий', 'фио']):
             cols_to_drop.append(col)
-        elif df[col].dtype == 'object' and df[col].nunique() > len(df) * 0.4:
+        elif not pd.api.types.is_numeric_dtype(df[col]) and df[col].nunique() > len(df) * 0.4:
             cols_to_drop.append(col)
             
     if cols_to_drop:
@@ -52,7 +52,7 @@ def load_and_clean_data(filepath='dataset_final.csv'):
     
     # Подготовка таргета
     y = df[target_col].copy()
-    if y.dtype == object:
+    if not pd.api.types.is_numeric_dtype(y):
         y_str = y.astype(str).str.strip().str.upper()
         y = y_str.map({
             'YES': 1, 'Y': 1, 'ДА': 1, 'Д': 1, '1': 1, 'TRUE': 1,

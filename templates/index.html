@@ -104,23 +104,35 @@
                 <h3>Demographics</h3>
               </div>
               <div class="input-group">
-                <label for="age">Age (years)</label>
+                <label for="age">Возраст (Age, years)</label>
                 <input type="number" id="age" name="age" min="18" max="100" value="45" required>
               </div>
               <div class="input-group">
-                <label for="sex">Sex</label>
+                <label for="sex">Пол (Sex)</label>
                 <select id="sex" name="sex" required>
-                  <option value="1">Male</option>
-                  <option value="0">Female</option>
+                  <option value="choice_1">Мужчина (Male)</option>
+                  <option value="choice_0">Женщина (Female)</option>
                 </select>
               </div>
               <div class="input-group">
-                <label for="birth_place">Birth Place</label>
-                <input type="text" id="birth_place" name="birth_place" placeholder="City" value="Moscow" required>
+                <label for="birth_place">Место рождения (Birth Place)</label>
+                <select id="birth_place" name="birth_place" required>
+                  <option value="choice_0">Урджарский, Кокпектинский, Аксуатский, Зайсанский районы</option>
+                  <option value="choice_1">Бородулихинский, Жарминский, Аягузский, Шемонаихинский районы, гг. Семей, Курчатов</option>
+                  <option value="choice_2">Абайский, Бескарагайский, Жанасемейский р-ны, сельские округа г. Семей</option>
+                  <option value="choice_3">Саржалский с.о. Абайского р-на, Долонский с.о. Бескарагайского р-на, н.п. Сарапан и Иса</option>
+                  <option value="choice_4" selected>Другое (Other)</option>
+                </select>
               </div>
               <div class="input-group">
-                <label for="residence">Residence</label>
-                <input type="text" id="residence" name="residence" placeholder="City" value="Moscow" required>
+                <label for="residence">Место проживания (Residence)</label>
+                <select id="residence" name="residence" required>
+                  <option value="choice_0">Урджарский, Кокпектинский, Аксуатский, Зайсанский районы</option>
+                  <option value="choice_1">Бородулихинский, Жарминский, Аягузский, Шемонаихинский районы, гг. Семей, Курчатов</option>
+                  <option value="choice_2">Абайский, Бескарагайский, Жанасемейский р-ны, сельские округа г. Семей</option>
+                  <option value="choice_3">Саржалский с.о. Абайского р-на, Долонский с.о. Бескарагайского р-на, н.п. Сарапан и Иса</option>
+                  <option value="choice_4" selected>Другое (Other)</option>
+                </select>
               </div>
             </div>
 
@@ -131,25 +143,42 @@
                 <h3>Smoking History</h3>
               </div>
               <div class="input-group">
-                <label for="smoker">Smoking Status</label>
+                <label for="smoker">Статус курения (Smoking Status)</label>
                 <select id="smoker" name="smoker" required>
-                  <option value="0">Non-smoker</option>
-                  <option value="1">Smoker</option>
+                  <option value="choice_0" selected>Не курю (Non-smoker)</option>
+                  <option value="choice_1">Курю (Smoker)</option>
                 </select>
               </div>
-              <div id="smoking-details">
+              <div id="smoking-details" style="display: none;">
                 <div class="input-group">
-                  <label for="smoking_years">Smoking Years</label>
-                  <input type="number" id="smoking_years" name="smoking_years" min="0" value="0">
+                  <label for="smoking_years">Стаж курения (Smoking Duration)</label>
+                  <select id="smoking_years" name="smoking_years">
+                    <option value="choice_0" selected>не курю</option>
+                    <option value="choice_1">до 10 лет</option>
+                    <option value="choice_2">от 10 до 20 лет</option>
+                    <option value="choice_3">от 20 до 30 лет</option>
+                    <option value="choice_4">от 30 и выше</option>
+                  </select>
                 </div>
                 <div class="input-group">
-                  <label for="cigs_per_day">Cigarettes per Day</label>
-                  <input type="number" id="cigs_per_day" name="cigs_per_day" min="0" value="0">
+                  <label for="cigs_per_day">Сигарет в сутки (Cigarettes per Day)</label>
+                  <select id="cigs_per_day" name="cigs_per_day">
+                    <option value="choice_0" selected>не курю</option>
+                    <option value="choice_1">до 10 штук</option>
+                    <option value="choice_2">до 1 пачки</option>
+                    <option value="choice_3">1 пачку</option>
+                    <option value="choice_4">1 пачку и более</option>
+                  </select>
                 </div>
               </div>
               <div class="input-group" style="margin-top:1rem">
-                <label for="arvi_per_year">URTI per Year (times)</label>
-                <input type="number" id="arvi_per_year" name="arvi_per_year" min="0" value="1">
+                <label for="arvi_per_year">Заболеваемость ОРВИ в год (URTI per Year)</label>
+                <select id="arvi_per_year" name="arvi_per_year" required>
+                  <option value="choice_0">не болею</option>
+                  <option value="choice_1" selected>1 раз в год</option>
+                  <option value="choice_2">2 раза в год</option>
+                  <option value="choice_3">периодически</option>
+                </select>
               </div>
             </div>
 
@@ -161,56 +190,114 @@
               </div>
               <div class="binary-inputs">
                 <div class="check-item">
-                  <label>Family Cancer History</label>
-                  <select name="family_cancer_history"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Онкоанамнез у родителей и родственников</label>
+                  <select name="family_cancer_history">
+                    <option value="choice_0" selected>нет</option>
+                    <option value="choice_1">у одного из родителей</option>
+                    <option value="choice_2">у обоих родителей</option>
+                    <option value="choice_3">у родственников по материнской линии</option>
+                    <option value="choice_4">у родственников по отцовской линии</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Hemoptysis (Coughing Blood)</label>
-                  <select name="hemoptysis"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Кровохарканье (Hemoptysis)</label>
+                  <select name="hemoptysis">
+                    <option value="choice_0" selected>Нет</option>
+                    <option value="choice_1">Да</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Shortness of Breath</label>
-                  <select name="shortness_of_breath"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Одышка, нехватка воздуха (Shortness of Breath)</label>
+                  <select name="shortness_of_breath">
+                    <option value="choice_0" selected>Нет</option>
+                    <option value="choice_1">периодически</option>
+                    <option value="choice_2">часто</option>
+                    <option value="choice_3">при физической нагрузке</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Voice Change</label>
-                  <select name="voice_change"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Изменение в голосе (Voice Change)</label>
+                  <select name="voice_change">
+                    <option value="choice_0" selected>нет</option>
+                    <option value="choice_1">да</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Unexplained Weakness</label>
-                  <select name="weakness"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Слабость, не связанная ни с чем (Weakness)</label>
+                  <select name="weakness">
+                    <option value="choice_0" selected>нет</option>
+                    <option value="choice_1">периодически</option>
+                    <option value="choice_2">часто</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Persistent Cough</label>
-                  <select name="cough"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Вы кашляли? (Cough)</label>
+                  <select name="cough">
+                    <option value="choice_0" selected>нисколько</option>
+                    <option value="choice_1">немного</option>
+                    <option value="choice_2">не так мало</option>
+                    <option value="choice_3">очень сильно</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Swallowing Difficulties</label>
-                  <select name="swallowing_problems"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Проблемы с глотанием (Swallowing Difficulties)</label>
+                  <select name="swallowing_problems">
+                    <option value="choice_0" selected>нисколько</option>
+                    <option value="choice_1">немного</option>
+                    <option value="choice_2">не так мало</option>
+                    <option value="choice_3">очень сильно</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Chest Pain</label>
-                  <select name="chest_pain"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Боли в груди (Chest Pain)</label>
+                  <select name="chest_pain">
+                    <option value="choice_0" selected>нисколько</option>
+                    <option value="choice_1">немного</option>
+                    <option value="choice_2">не так мало</option>
+                    <option value="choice_3">очень сильно</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Arm or Shoulder Pain</label>
-                  <select name="arm_shoulder_pain"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Боли в руке или плече (Arm or Shoulder Pain)</label>
+                  <select name="arm_shoulder_pain">
+                    <option value="choice_0" selected>нисколько</option>
+                    <option value="choice_1">немного</option>
+                    <option value="choice_2">не так мало</option>
+                    <option value="choice_3">очень сильно</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Dry Cough</label>
-                  <select name="dry_cough"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Сухой кашель (Dry Cough)</label>
+                  <select name="dry_cough">
+                    <option value="choice_0" selected>нисколько</option>
+                    <option value="choice_1">немного</option>
+                    <option value="choice_2">не так мало</option>
+                    <option value="choice_3">очень сильно</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Unexplained Weight Loss</label>
-                  <select name="weight_loss"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Снижение веса, ни с чем не связанное (Weight Loss)</label>
+                  <select name="weight_loss">
+                    <option value="choice_0" selected>нисколько</option>
+                    <option value="choice_1">немного</option>
+                    <option value="choice_2">очень сильно</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Loss of Appetite</label>
-                  <select name="appetite_loss"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>Снижение аппетита (Appetite Loss)</label>
+                  <select name="appetite_loss">
+                    <option value="choice_0" selected>нисколько</option>
+                    <option value="choice_1">немного</option>
+                    <option value="choice_2">не так мало</option>
+                    <option value="choice_3">очень сильно</option>
+                  </select>
                 </div>
                 <div class="check-item">
-                  <label>Pulmonologist Follow-up</label>
-                  <select name="pulmonologist_followup"><option value="0">No</option><option value="1">Yes</option></select>
+                  <label>На "Д" учете у пульмонолога (Pulmonologist follow-up)</label>
+                  <select name="pulmonologist_followup">
+                    <option value="choice_0" selected>Нет</option>
+                    <option value="choice_1">Да</option>
+                  </select>
                 </div>
               </div>
             </div>

@@ -60,12 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── SMOKING TOGGLE ──
   if (smokerSelect) {
     smokerSelect.addEventListener('change', e => {
-      if (e.target.value === '1') {
+      if (e.target.value === 'choice_1') {
         smokingDetails.style.display = 'block';
       } else {
         smokingDetails.style.display = 'none';
-        document.getElementById('smoking_years').value = 0;
-        document.getElementById('cigs_per_day').value = 0;
+        document.getElementById('smoking_years').value = 'choice_0';
+        document.getElementById('cigs_per_day').value = 'choice_0';
       }
     });
   }
