@@ -100,7 +100,12 @@ document.addEventListener('DOMContentLoaded', () => {
       hideLoading();
 
       if (result.status === 'success') {
-        lastData = { ...data, LUNG_CANCER: result.prediction };
+        lastData = { 
+          ...data, 
+          LUNG_CANCER: result.prediction,
+          probability: result.probability,
+          risk_group: result.metadata.risk_group
+        };
         showResults(result);
       } else {
         alert('Error: ' + (result.error || 'Unknown error'));
@@ -264,95 +269,119 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ── INITIALIZE ANALYTICS CHARTS ──
-  function initAnalyticsCharts() {
-    // Risk Distribution
-    const ctxRiskDist = document.getElementById('riskDistChart');
-    if (ctxRiskDist) {
-      const riskDistCtx = ctxRiskDist.getContext('2d');
-      if (riskDistChart) riskDistChart.destroy();
-      riskDistChart = new Chart(riskDistCtx, {
-        type: 'bar',
-        data: {
-          labels: ['<10%', '10-30%', '30-60%', '>60%'],
-          datasets: [{
-            label: 'Number of Patients',
-            data: [2100, 1247, 650, 250],
-            backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#dc2626'],
-            borderRadius: 8,
-            borderSkipped: false
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: '#94a3b8' } }
-          },
-          scales: {
-            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
-          }
-        }
-      });
-    }
+  async function initAnalyticsCharts() {
+    try {
+      console.log('Fetching analytics data...');
+      const res = await fetch('/analytics_data');
+      const data = await res.json();
+      console.log('Analytics data:', data);
 
-    // Activity Chart
-    const ctxActivity = document.getElementById('activityChart');
-    if (ctxActivity) {
-      const actCtx = ctxActivity.getContext('2d');
-      if (activityChart) activityChart.destroy();
-      activityChart = new Chart(actCtx, {
-        type: 'line',
-        data: {
-          labels: ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00'],
-          datasets: [{
-            label: 'Diagnoses',
-            data: [12, 25, 45, 89, 156, 112],
-            borderColor: '#6366f1',
-            backgroundColor: 'rgba(99,102,241,0.1)',
-            fill: true,
-            tension: 0.4,
-            pointRadius: 4,
-            pointBackgroundColor: '#6366f1'
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { labels: { color: '#94a3b8' } }
-          },
-          scales: {
-            y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
-            x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
-          }
-        }
-      });
-    }
+      if (data.error) {
+        console.error('Error fetching analytics:', data.error);
+        return;
+      }
 
-    // Risk Group Chart
-    const ctxRiskGroup = document.getElementById('riskGroupChart');
-    if (ctxRiskGroup) {
-      const riskGroupCtx = ctxRiskGroup.getContext('2d');
-      if (riskGroupChart) riskGroupChart.destroy();
-      riskGroupChart = new Chart(riskGroupCtx, {
-        type: 'doughnut',
-        data: {
-          labels: ['G-I (Low)', 'G-II (Moderate)', 'G-III (Elevated)', 'G-IV (High)'],
-          datasets: [{
-            data: [2100, 1400, 650, 97],
-            backgroundColor: ['#10b981', '#06b6d4', '#f59e0b', '#ef4444'],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position: 'bottom', labels: { color: '#94a3b8' } }
+      // Update stat cards
+      const statAnalyzed = document.getElementById('stat-analyzed');
+      if (statAnalyzed) statAnalyzed.textContent = data.total_analyzed;
+
+      const statAvgRisk = document.getElementById('stat-avg-risk');
+      if (statAvgRisk) statAvgRisk.textContent = data.avg_risk.toFixed(1) + '%';
+
+      const statSmokerPct = document.getElementById('stat-smoker-pct');
+      if (statSmokerPct) statSmokerPct.textContent = data.smoker_pct.toFixed(0) + '%';
+
+      // Risk Distribution Chart (Bar)
+      const ctxRiskDist = document.getElementById('riskDistChart');
+      if (ctxRiskDist) {
+        const riskDistCtx = ctxRiskDist.getContext('2d');
+        if (riskDistChart) riskDistChart.destroy();
+        riskDistChart = new Chart(riskDistCtx, {
+          type: 'bar',
+          data: {
+            labels: ['<10%', '10-30%', '30-60%', '>60%'],
+            datasets: [{
+              label: 'Number of Patients',
+              data: data.risk_dist,
+              backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#dc2626'],
+              borderRadius: 8,
+              borderSkipped: false
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: '#94a3b8' } }
+            },
+            scales: {
+              y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+              x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+            }
           }
-        }
-      });
+        });
+      }
+
+      // Age Group Average Risk Chart (Line)
+      const ctxActivity = document.getElementById('activityChart');
+      if (ctxActivity) {
+        const actCtx = ctxActivity.getContext('2d');
+        if (activityChart) activityChart.destroy();
+        activityChart = new Chart(actCtx, {
+          type: 'line',
+          data: {
+            labels: ['30s', '40s', '50s', '60s', '70s+'],
+            datasets: [{
+              label: 'Average Risk (%)',
+              data: data.age_group_risks,
+              borderColor: '#6366f1',
+              backgroundColor: 'rgba(99,102,241,0.1)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 4,
+              pointBackgroundColor: '#6366f1'
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { labels: { color: '#94a3b8' } }
+            },
+            scales: {
+              y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } },
+              x: { ticks: { color: '#94a3b8' }, grid: { display: false } }
+            }
+          }
+        });
+      }
+
+      // Risk Group Chart (Doughnut)
+      const ctxRiskGroup = document.getElementById('riskGroupChart');
+      if (ctxRiskGroup) {
+        const riskGroupCtx = ctxRiskGroup.getContext('2d');
+        if (riskGroupChart) riskGroupChart.destroy();
+        riskGroupChart = new Chart(riskGroupCtx, {
+          type: 'doughnut',
+          data: {
+            labels: ['G-I (Low)', 'G-II (Moderate)', 'G-III (Elevated)', 'G-IV (High)'],
+            datasets: [{
+              data: data.risk_groups,
+              backgroundColor: ['#10b981', '#06b6d4', '#f59e0b', '#ef4444'],
+              borderWidth: 0
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { position: 'bottom', labels: { color: '#94a3b8' } }
+            }
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error loading analytics charts:', err);
     }
   }
 

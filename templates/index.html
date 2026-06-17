@@ -30,12 +30,6 @@
       <button class="nav-item" data-tab="analytics">
         <i class="fas fa-chart-line"></i> Analytics
       </button>
-      <button class="nav-item" data-tab="about">
-        <i class="fas fa-info-circle"></i> About
-      </button>
-      <button class="nav-item" data-tab="settings">
-        <i class="fas fa-cog"></i> Settings
-      </button>
     </nav>
 
     <div class="sidebar-footer">
@@ -319,7 +313,6 @@
             <h2><i class="fas fa-file-medical-alt"></i> Diagnostic Report</h2>
             <div class="result-actions">
               <button id="save-patient-btn" class="btn-secondary"><i class="fas fa-save"></i> Save</button>
-              <button class="btn-icon" title="Export PDF"><i class="fas fa-file-pdf"></i></button>
             </div>
           </div>
 
@@ -420,33 +413,33 @@
           <div class="stat-card premium">
             <div class="stat-icon"><i class="fas fa-users-md"></i></div>
             <div class="stat-info">
-              <span class="stat-num">4,247</span>
-              <span class="stat-desc">Analyzed</span>
-              <span class="stat-trend">↑ 12.5%</span>
+              <span class="stat-num" id="stat-analyzed">0</span>
+              <span class="stat-desc">Analyzed Cases</span>
+              <span class="stat-trend">Total saved</span>
             </div>
           </div>
           <div class="stat-card premium">
             <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
             <div class="stat-info">
-              <span class="stat-num">98.2%</span>
-              <span class="stat-desc">Accuracy</span>
+              <span class="stat-num" id="stat-accuracy">98.2%</span>
+              <span class="stat-desc">Base Accuracy</span>
               <span class="stat-trend">ROC-AUC 0.994</span>
             </div>
           </div>
           <div class="stat-card premium">
-            <div class="stat-icon"><i class="fas fa-hourglass-end"></i></div>
+            <div class="stat-icon"><i class="fas fa-chart-line"></i></div>
             <div class="stat-info">
-              <span class="stat-num">320ms</span>
-              <span class="stat-desc">Analysis Time</span>
-              <span class="stat-trend">Inference <100ms</span>
+              <span class="stat-num" id="stat-avg-risk">0.0%</span>
+              <span class="stat-desc">Average Risk</span>
+              <span class="stat-trend">Calibrated</span>
             </div>
           </div>
           <div class="stat-card premium">
-            <div class="stat-icon"><i class="fas fa-database"></i></div>
+            <div class="stat-icon"><i class="fas fa-smoking"></i></div>
             <div class="stat-info">
-              <span class="stat-num">4M+</span>
-              <span class="stat-desc">Training Cases</span>
-              <span class="stat-trend">847 GB data</span>
+              <span class="stat-num" id="stat-smoker-pct">0%</span>
+              <span class="stat-desc">Smoker Ratio</span>
+              <span class="stat-trend">Saved patients</span>
             </div>
           </div>
         </div>
@@ -464,8 +457,8 @@
 
           <div class="card">
             <div class="card-header">
-              <div class="card-icon icon-cyan"><i class="fas fa-clock"></i></div>
-              <h3>Daily Activity</h3>
+              <div class="card-icon icon-cyan"><i class="fas fa-history"></i></div>
+              <h3>Average Risk by Age Group</h3>
             </div>
             <div class="chart-wrap">
               <canvas id="activityChart"></canvas>
@@ -479,139 +472,6 @@
             </div>
             <div class="chart-wrap">
               <canvas id="riskGroupChart"></canvas>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ── TAB: ABOUT ── -->
-      <section id="about-tab" class="tab-content">
-        <div class="page-header">
-          <h1>About LungAI</h1>
-          <p>Advanced AI-based early lung cancer diagnostics system</p>
-        </div>
-
-        <div class="about-grid premium">
-          <div class="stat-card">
-            <span class="stat-val">98.2%</span>
-            <span class="stat-label">Accuracy</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-val">0.994</span>
-            <span class="stat-label">ROC-AUC</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-val">4000+</span>
-            <span class="stat-label">Records</span>
-          </div>
-          <div class="stat-card">
-            <span class="stat-val">24/7</span>
-            <span class="stat-label">Availability</span>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon icon-indigo"><i class="fas fa-brain"></i></div>
-            <h3>Technology</h3>
-          </div>
-          <p class="about-desc">
-            LungAI utilizes a strictly monotonic ML model <strong>CatBoostClassifier</strong> with embedded clinical constraints and expert decision rules.
-            The system analyzes a combination of demographic factors, smoking history, and clinical symptoms to detect early indicators of lung pathology.
-          </p>
-        </div>
-
-        <div class="features-grid">
-          <div class="feature-box">
-            <i class="fas fa-lock"></i>
-            <h4>Privacy</h4>
-            <p>All data processed locally. AES-256 encryption.</p>
-          </div>
-          <div class="feature-box">
-            <i class="fas fa-tachometer-alt"></i>
-            <h4>Speed</h4>
-            <p>Analysis in 320ms. Neural network inference &lt;100ms.</p>
-          </div>
-          <div class="feature-box">
-            <i class="fas fa-check-double"></i>
-            <h4>Validation</h4>
-            <p>Clinically approved. Monotonic predictions.</p>
-          </div>
-          <div class="feature-box">
-            <i class="fas fa-chart-line"></i>
-            <h4>Accuracy</h4>
-            <p>ROC-AUC 0.994. Precision/Recall optimization.</p>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            <div class="card-icon icon-cyan"><i class="fas fa-graduation-cap"></i></div>
-            <h3>Academic Foundations</h3>
-          </div>
-          <p class="about-desc">
-            Developed based on clinical research data from leading oncology research institutes and verified on histopathology-confirmed cases.
-            The model is trained on 4000+ verified clinical cases to ensure clinical grade reliability.
-          </p>
-        </div>
-
-        <div class="disclaimer-box">
-          <i class="fas fa-exclamation-triangle"></i>
-          <p>
-            <strong>Important:</strong> LungAI results are for informational and educational purposes only. They do not substitute for professional medical consultation,
-            diagnostics, or treatment, which must be performed by a licensed oncologist or pulmonologist based on physical examination and standard clinical procedures.
-          </p>
-        </div>
-      </section>
-
-      <!-- ── TAB: SETTINGS ── -->
-      <section id="settings-tab" class="tab-content">
-        <div class="page-header">
-          <h1>System Settings</h1>
-          <p>Configure system behavior and platform preferences</p>
-        </div>
-
-        <div class="settings-grid">
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon icon-indigo"><i class="fas fa-sliders-h"></i></div>
-              <h3>General Settings</h3>
-            </div>
-            <div class="setting-item">
-              <label class="setting-label">Interface Language</label>
-              <select class="setting-select">
-                <option selected>English</option>
-                <option>Russian</option>
-                <option>Español</option>
-              </select>
-            </div>
-            <div class="setting-item">
-              <label class="setting-label">Theme</label>
-              <select class="setting-select">
-                <option selected>Dark</option>
-                <option>Light</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <div class="card-icon icon-pink"><i class="fas fa-bell"></i></div>
-              <h3>Notifications</h3>
-            </div>
-            <div class="toggle-item">
-              <label>Email Notifications</label>
-              <label class="toggle-switch">
-                <input type="checkbox" checked>
-                <span></span>
-              </label>
-            </div>
-            <div class="toggle-item">
-              <label>High Risk Alerts</label>
-              <label class="toggle-switch">
-                <input type="checkbox" checked>
-                <span></span>
-              </label>
             </div>
           </div>
         </div>

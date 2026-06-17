@@ -1,0 +1,6 @@
+age,sex,smoker,smoking_years,cigs_per_day,arvi_per_year,family_cancer_history,hemoptysis,shortness_of_breath,voice_change,weakness,cough,swallowing_problems,chest_pain,arm_shoulder_pain,dry_cough,weight_loss,appetite_loss,pulmonologist_followup,birth_place,residence,LUNG_CANCER,probability,risk_group
+65,1,1,40,20,4,1,1,2,1,2,3,3,3,2,3,2,3,1,Abay,Abay,1,92.4,G-IV (High)
+34,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,Other,Other,0,1.0,G-I (Low)
+48,1,1,15,10,2,0,0,1,0,1,1,0,1,0,1,0,1,0,Semey,Semey,0,18.5,G-II (Moderate)
+55,0,1,25,15,2,1,0,2,0,1,2,1,2,1,2,1,2,1,Semey,Semey,1,48.2,G-III (Elevated)
+72,1,0,0,0,1,0,0,1,0,1,1,0,0,0,0,0,0,0,Other,Other,0,5.6,G-I (Low)

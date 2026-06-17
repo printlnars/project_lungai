@@ -534,16 +534,92 @@ def predict():
         return jsonify({"error": str(e)}), 400
 
 
+SAVED_PATIENTS_PATH = "saved_patients.csv"
+
+@app.route("/analytics_data")
+def analytics_data():
+    if not os.path.exists(SAVED_PATIENTS_PATH):
+        return jsonify({
+            "total_analyzed": 0,
+            "avg_risk": 0.0,
+            "smoker_pct": 0.0,
+            "risk_dist": [0, 0, 0, 0],
+            "age_group_risks": [0.0, 0.0, 0.0, 0.0, 0.0],
+            "risk_groups": [0, 0, 0, 0]
+        })
+    
+    try:
+        df = pd.read_csv(SAVED_PATIENTS_PATH)
+        total = len(df)
+        if total == 0:
+            return jsonify({
+                "total_analyzed": 0,
+                "avg_risk": 0.0,
+                "smoker_pct": 0.0,
+                "risk_dist": [0, 0, 0, 0],
+                "age_group_risks": [0.0, 0.0, 0.0, 0.0, 0.0],
+                "risk_groups": [0, 0, 0, 0]
+            })
+        
+        avg_risk = float(df['probability'].mean())
+        smoker_pct = float((df['smoker'] == 1).sum() / total * 100)
+        
+        # Risk distribution categories: <10%, 10-30%, 30-60%, >=60%
+        c_lt_10 = int((df['probability'] < 10).sum())
+        c_10_30 = int(((df['probability'] >= 10) & (df['probability'] < 30)).sum())
+        c_30_60 = int(((df['probability'] >= 30) & (df['probability'] < 60)).sum())
+        c_gt_60 = int((df['probability'] >= 60).sum())
+        risk_dist = [c_lt_10, c_10_30, c_30_60, c_gt_60]
+        
+        # Age group average risks: 30-39, 40-49, 50-59, 60-69, 70+
+        age_bins = [30, 40, 50, 60, 70, 120]
+        age_labels = ['30s', '40s', '50s', '60s', '70s+']
+        df['age_group'] = pd.cut(df['age'], bins=age_bins, labels=age_labels, right=False)
+        
+        age_group_risks = []
+        for label in age_labels:
+            group_df = df[df['age_group'] == label]
+            if len(group_df) > 0:
+                age_group_risks.append(round(float(group_df['probability'].mean()), 1))
+            else:
+                age_group_risks.append(0.0)
+                
+        # Risk groups: G-I (Low), G-II (Moderate), G-III (Elevated), G-IV (High)
+        c_low = int((df['risk_group'] == 'G-I (Low)').sum())
+        c_mod = int((df['risk_group'] == 'G-II (Moderate)').sum())
+        c_elev = int((df['risk_group'] == 'G-III (Elevated)').sum())
+        c_high = int((df['risk_group'] == 'G-IV (High)').sum())
+        risk_groups = [c_low, c_mod, c_elev, c_high]
+        
+        return jsonify({
+            "total_analyzed": total,
+            "avg_risk": avg_risk,
+            "smoker_pct": smoker_pct,
+            "risk_dist": risk_dist,
+            "age_group_risks": age_group_risks,
+            "risk_groups": risk_groups
+        })
+    except Exception as e:
+        print(f"Error in analytics_data: {e}")
+        return jsonify({"error": str(e)}), 400
+
 @app.route("/save_patient", methods=["POST"])
 def save_patient():
     try:
         data = request.json
         model_input, _, _, _, _, _, _, _ = process_patient_inputs(data)
         model_input['LUNG_CANCER'] = int(data.get('LUNG_CANCER', 0))
-        df = pd.read_csv(DATASET_PATH)
+        model_input['probability'] = float(data.get('probability', 0.0))
+        model_input['risk_group'] = str(data.get('risk_group', 'G-I (Low)'))
+        
+        if os.path.exists(SAVED_PATIENTS_PATH):
+            df = pd.read_csv(SAVED_PATIENTS_PATH)
+        else:
+            df = pd.DataFrame(columns=list(model_input.keys()))
+            
         new_row = pd.DataFrame([model_input])
         df = pd.concat([df, new_row], ignore_index=True)
-        df.to_csv(DATASET_PATH, index=False)
+        df.to_csv(SAVED_PATIENTS_PATH, index=False)
         return jsonify({"status": "success", "message": "Patient saved"})
     except Exception as e:
         return jsonify({"error": str(e)}), 400
